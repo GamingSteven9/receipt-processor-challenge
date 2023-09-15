@@ -1,6 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 app = Flask(__name__)
 
-@app.route('/')
-def base():
-    return render_template('base.html')
+#Render HTML page
+@app.route('/', methods=['POST', "GET"])
+def index():
+    return render_template('index.html')
