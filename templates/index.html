@@ -8,9 +8,8 @@
 <body>
    <h1>Receipt Processor</h1>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-   <script src="js/bootstrap.min.js"></script>
 
-   <form action="{{ url_for('process') }}" id="form1" method="post" enctype="multipart/form-data">  <!-- Form to generate id from receipt -->
+   <form action="{{ url_for('receipts') }}" id="form1" method="post" enctype="multipart/form-data">  <!-- Form to generate id from receipt -->
     {{ Receiptform.hidden_tag() }}
     {{ Receiptform.jsonFile.label }} {{ Receiptform.jsonFile }} <!--Browse files -->
     <br>
@@ -18,11 +17,12 @@
     <br>
    </form>
 
-   <form action="{{ url_for('points') }}" id="form2" method="post">  <!-- Form to get points from receipt -->
+   <form action="{{ url_for('receipts') }}" id="form2" method="post">  <!-- Form to get points from receipt -->
     {{ idForm.hidden_tag() }}
     {{ idForm.receiptID.label }} {{ idForm.receiptID }}
+    <br>
     {{ idForm.submitID()}}
-    
+    <br>
    </form>
 
    <script>

@@ -1,10 +1,8 @@
-from flask import Flask, render_template, request, jsonify, json, url_for, redirect
+from flask import Flask, render_template, request, jsonify, json, url_for, redirect, session
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired, FileAllowed
+from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField, SubmitField, FileField
-from wtforms.validators import DataRequired
-from werkzeug.utils import secure_filename
-from werkzeug.datastructures import CombinedMultiDict
+from wtforms.validators import DataRequired, ValidationError
 from datetime import date, time
 from io import BytesIO
 import json
@@ -13,32 +11,34 @@ import math
 import secrets
 import os
 
-UPLOAD_FOLDER = '/app/static/upload_folder'
-ALLOWED_EXTENSIONS = {'json'}
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'oursecretkey'
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['UPLOAD_EXTENSIONS'] = ['.json']
-
 ids = {}
 
-class receipt(FlaskForm):
+testID = False
+
+class receipt(FlaskForm): # The form that handles the json file
     jsonFile = FileField("Insert Receipt", validators=[FileRequired()])
     submit = SubmitField("Generate ID")
 
-class getID(FlaskForm):
-    receiptID = StringField("Insert ID")
+    def validateFile(self, name):
+        '''if name != '.json':
+            raise ValidationError(" The file must be a json file")'''
+        
+        match (os.path.splitext(name))[-1]: # If the input file is not a json file, raise an error
+            case '.json':
+                pass
+            case _:
+                raise ValidationError(" The file must be a json file")
+            
+class getID(FlaskForm): # The form that handles the id
+    receiptID = StringField("Insert ID", validators=[DataRequired()])
     submitID = SubmitField("Get Points")
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def determinePoints(jDict): # Determines the amount of points from the receipt
     points = 0
-    randomid = secrets.token_hex(36)
+    randomid = secrets.token_hex(4) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(6) #Generate a random id
 
     for i in jDict:
         match i:
@@ -104,60 +104,45 @@ def getPointsFromID(rID): #Gets the points from the given id
 #Render HTML page
 @app.route('/',  methods=['GET', 'POST'])
 def index():
-    return redirect(url_for('receipts')) # Redirect to /receipts
+    return redirect(url_for('receipts')) # Redirect to /receipts/<id>/points
 
 @app.route('/receipts',  methods=['GET', 'POST'])
 def receipts():
     jsonFile = False
     Receiptform = receipt()
+
     receiptID = False
     idForm = getID()
 
-    #url = url_for('')
-
-    #print(Receiptform.submit.data)
-    #print(idForm.submitID.data)
+    match Receiptform.submit.data: # Handles the data from the re
+        case True:
+            jsonData = Receiptform.jsonFile.data
+            #Receiptform.jsonFile.data = ''
+            Receiptform.validateFile(request.files['jsonFile'].filename)
+            jsonContent = BytesIO(jsonData.read())
+            jsonContent.seek(0)
+            content = jsonContent.read() # Turns the json file data into a dictionary
+            session["dictID"] = json.loads(content)
+            jsonContent.close()
+            return redirect(url_for('process'), code=307) # Write comment for code 307
+    
+    match idForm.submitID.data: 
+        case True:
+            receiptID = idForm.receiptID.data
+            #idForm.receiptID.data = ''
+            session["sessionID"] = receiptID
+            pointsURL = url_for('points', id=receiptID)
+            return redirect(pointsURL) # Redirect to /receipts
 
     return render_template('index.html', Receiptform=Receiptform, jsonFile=jsonFile, idForm=idForm, receiptID=receiptID)
 
 @app.route('/receipts/process',  methods=['POST'])
 def process():
-    jsonFile = False
-    Receiptform = receipt()
-    receiptID = False
-    idForm = getID()
+    return jsonify(determinePoints(session["dictID"]))
 
-    if Receiptform.validate_on_submit():
-        jsonData = Receiptform.jsonFile.data
-        jsonContent = BytesIO(jsonData.read())
-        jsonContent.seek(0)
-        content = jsonContent.read() # Turns the json file data into a dictionary
-        receiptDict = json.loads(content)
-        return jsonify(determinePoints(receiptDict))
-
-    #print(Receiptform.submit.data)
-    #print(idForm.submitID.data)
-
-    return render_template('index.html', Receiptform=Receiptform, jsonFile=jsonFile, idForm=idForm, receiptID=receiptID)
-
-@app.route('/receipts/{id}/',  methods=['GET', 'POST'])
-def id():
-    return redirect(url_for('/receipts/{id}/points')) # Redirect to /receipts
-
-@app.route('/receipts/{id}/points',  methods=['GET', 'POST'])
-def points():
-    jsonFile = False
-    Receiptform = receipt()
-    receiptID = False
-    idForm = getID()
-
-    if request.method == 'POST':
-        receiptID = idForm.receiptID.data
-        idForm.receiptID.data = ''
-        id = receiptID
-        return jsonify(getPointsFromID(receiptID))
-
-    return render_template('index.html', Receiptform=Receiptform, jsonFile=jsonFile, idForm=idForm, receiptID=receiptID)
+@app.route('/receipts/<id>/points',  methods=['GET'])
+def points(id):
+    return jsonify(getPointsFromID(session["sessionID"]))
 
 if __name__ == '__main__':
     app.run(debug=True)
