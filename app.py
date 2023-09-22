@@ -16,29 +16,24 @@ app.config['SECRET_KEY'] = 'oursecretkey'
 
 ids = {}
 
-testID = False
-
 class receipt(FlaskForm): # The form that handles the json file
     jsonFile = FileField("Insert Receipt", validators=[FileRequired()])
     submit = SubmitField("Generate ID")
 
     def validateFile(self, name):
-        '''if name != '.json':
-            raise ValidationError(" The file must be a json file")'''
         
         match (os.path.splitext(name))[-1]: # If the input file is not a json file, raise an error
             case '.json':
                 pass
             case _:
-                raise ValidationError(" The file must be a json file")
+                raise ValidationError("The file must be a json file")
             
 class getID(FlaskForm): # The form that handles the id
     receiptID = StringField("Insert ID", validators=[DataRequired()])
     submitID = SubmitField("Get Points")
 
 def determinePoints(jDict): # Determines the amount of points from the receipt
-    points = 0
-    randomid = secrets.token_hex(4) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(6) #Generate a random id
+    points = 0 # Variable thats holds the total amount of points
 
     for i in jDict:
         match i:
@@ -46,21 +41,18 @@ def determinePoints(jDict): # Determines the amount of points from the receipt
             case 'retailer':
                 retailer = re.sub('\W', '', jDict[i]) # Use regex to replace all non-numerical character with an empty string
                 points+=len(retailer)
-                #print("points: " + str(points))
 
             case 'purchaseDate':
                 pDate = int(date.fromisoformat(jDict[i]).strftime('%d')) #Gets the day from the purchaseDate
                 match pDate % 2: #If the date is an odd number add six points
                     case 1:
                         points+=6
-                #print("points: " + str(points))
 
             case 'purchaseTime':
                 pTime = time.fromisoformat(jDict[i])
                 match pTime > time.fromisoformat('14:00:00') and pTime < time.fromisoformat('16:00:00'): #Check to see if time is between 2 pm and 4 pm
                     case True:
                         points+=10
-                #print("points: " + str(points))
 
             case 'total':
                 match float(jDict[i]).is_integer(): #If the total is a round number, add 50 points
@@ -69,7 +61,6 @@ def determinePoints(jDict): # Determines the amount of points from the receipt
                 match float(jDict[i]) % 0.25: #If the total is a multiple of 0.25, add 25 points
                     case 0:
                         points+=25
-                #print("points: " + str(points))
 
             case 'items':
                 itemsLength = len(jDict[i])
@@ -78,46 +69,57 @@ def determinePoints(jDict): # Determines the amount of points from the receipt
                         points+=round((5 * len(jDict[i]) / 2))
                     case 1:
                         points+=round((5 * (len(jDict[i]) - 1) / 2))
-                #print("points: " + str(points))
+                    case _:
+                        pass
 
                 for j in jDict[i]:
                     match len(j['shortDescription'].strip()) % 3:
                         case 0:
                             points+=math.ceil(float(j['price']) * 0.2) #Use math.ceil(x) to round up
-                #print("points: " + str(points))
+                        case _:
+                            pass
+            
+            case _:
+                pass
 
-    #print("points: " + str(points))
+    return points
 
-    match (randomid in ids):
+def addID(points): # Attaches the points to an id and add it to the dictionary
+    randomid = secrets.token_hex(4) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(6) # Generate a random id
+
+    match (randomid in ids): # If the id is not int already present in ids, attach it to the points
         case False:
             ids[randomid] = points
-
-    #print(ids)
-
+        case True:
+            while randomid in ids:
+                randomid = secrets.token_hex(4) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(2) + "-" + secrets.token_hex(6) # Generate a new random id
+        case _:
+            pass
+        
     return {"id": randomid}
 
 def getPointsFromID(rID): #Gets the points from the given id
     match rID in ids:
             case True:
                 return {"points": ids[rID]}
+            case _:
+                pass
 
-#Render HTML page
 @app.route('/',  methods=['GET', 'POST'])
 def index():
-    return redirect(url_for('receipts')) # Redirect to /receipts/<id>/points
+    return redirect(url_for('receipts')) # Redirect to /receipts
 
+#Render the home page
 @app.route('/receipts',  methods=['GET', 'POST'])
 def receipts():
     jsonFile = False
-    Receiptform = receipt()
-
     receiptID = False
+    Receiptform = receipt()
     idForm = getID()
 
-    match Receiptform.submit.data: # Handles the data from the re
+    match Receiptform.submit.data: # Operates on the data from the Receiptform
         case True:
             jsonData = Receiptform.jsonFile.data
-            #Receiptform.jsonFile.data = ''
             Receiptform.validateFile(request.files['jsonFile'].filename)
             jsonContent = BytesIO(jsonData.read())
             jsonContent.seek(0)
@@ -125,20 +127,23 @@ def receipts():
             session["dictID"] = json.loads(content)
             jsonContent.close()
             return redirect(url_for('process'), code=307) # Write comment for code 307
+        case _:
+            pass
     
-    match idForm.submitID.data: 
+    match idForm.submitID.data: # Operates on the data from the idForm
         case True:
             receiptID = idForm.receiptID.data
-            #idForm.receiptID.data = ''
             session["sessionID"] = receiptID
             pointsURL = url_for('points', id=receiptID)
             return redirect(pointsURL) # Redirect to /receipts
+        case _:
+            pass
 
-    return render_template('index.html', Receiptform=Receiptform, jsonFile=jsonFile, idForm=idForm, receiptID=receiptID)
+    return render_template('index.html', Receiptform=Receiptform, jsonFile=jsonFile, idForm=idForm, receiptID=receiptID) 
 
 @app.route('/receipts/process',  methods=['POST'])
 def process():
-    return jsonify(determinePoints(session["dictID"]))
+    return jsonify(addID(determinePoints(session["dictID"])))
 
 @app.route('/receipts/<id>/points',  methods=['GET'])
 def points(id):
