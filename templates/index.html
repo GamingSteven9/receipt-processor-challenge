@@ -17,18 +17,18 @@
     <br>
    </form>
 
+   <script> // Javascript used to set file input to .json files
+    const jsonInput = document.getElementById('jsonFile'); // Get the file input element by its id
+    jsonInput.accept = '.json' // Set the accept attribute to restrict file types to .json
+    </script>
+
    <form action="{{ url_for('receipts') }}" id="form2" method="post">  <!-- Form to get points from receipt -->
     {{ idForm.hidden_tag() }}
-    {{ idForm.receiptID.label }} {{ idForm.receiptID }}
+    {{ idForm.receiptID.label }} {{idForm.receiptID(style='width: 250px')}} <!-- Increase the width of the stringfield so the id is fully visible on the screen-->
     <br>
     {{ idForm.submitID()}}
     <br>
    </form>
-
-   <script>
-    const fileInput = document.getElementById('jsonFile'); // Get the file input element by its id
-    fileInput.accept = '.json' // Set the accept attribute to restrict file types to .json
-    </script>
 
 </body>
 </html>
