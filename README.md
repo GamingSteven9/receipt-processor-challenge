@@ -5,6 +5,7 @@ This project was built using Python, HTML, and Flask
 # Install:
 
 git clone https://github.com/GamingSteven9/receipt-processor-challenge.git
+
 cd receipt-processor-challenge
 
 Build the docker image:
