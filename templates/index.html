@@ -7,22 +7,18 @@
     </head>
 <body>
    <h1>Receipt Processor</h1>
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
-   <form action="{{ url_for('receipts') }}" id="form1" method="post" enctype="multipart/form-data">  <!-- Form to generate id from receipt -->
+   <form action="{{ url_for('receipts') }}" method="post" enctype="multipart/form-data">  <!-- Form to generate id from receipt -->
     {{ Receiptform.hidden_tag() }}
-    {{ Receiptform.jsonFile.label }} {{ Receiptform.jsonFile }} <!--Browse files -->
+    {{ Receiptform.jsonFile.label }} {{ Receiptform.jsonFile(accept=".json") }} <!-- Set the accepted file extension to ".json" when browsing the file -->
     <br>
     {{ Receiptform.submit()}} <!--Submit button-->
     <br>
    </form>
 
-   <script> // Javascript used to set file input to .json files
-    const jsonInput = document.getElementById('jsonFile'); // Get the file input element by its id
-    jsonInput.accept = '.json' // Set the accept attribute to restrict file types to .json
-    </script>
+   <br>
 
-   <form action="{{ url_for('receipts') }}" id="form2" method="post">  <!-- Form to get points from receipt -->
+   <form action="{{ url_for('receipts') }}" method="post" enctype="multipart/form-data">  <!-- Form to get points from receipt -->
     {{ idForm.hidden_tag() }}
     {{ idForm.receiptID.label }} {{idForm.receiptID(style='width: 250px')}} <!-- Increase the width of the stringfield so the id is fully visible on the screen-->
     <br>
