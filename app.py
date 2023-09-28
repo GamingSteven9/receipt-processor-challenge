@@ -157,11 +157,11 @@ def receipts():
 
     return render_template('index.html', ReceiptForm=ReceiptForm, IDForm=IDForm, jsonFile=jsonFile, receiptID=receiptID) 
 
-@app.route('/receipts/process',  methods=['POST']) # A post endpoint that takes a json receipt and returns a JSON object with a randomly generated ID
+@app.route('/receipts/process',  methods=['POST']) # A post endpoint that takes a JSON receipt and returns a JSON object with a randomly generated ID
 def process():
     return jsonify(addID(determinePoints(session["dictID"])))
 
-@app.route('/receipts/<id>/points',  methods=['GET']) # A getter endpoint that looks up the receipt by the ID and returns an object specifying the points awarded
+@app.route('/receipts/<id>/points',  methods=['GET']) # A getter endpoint that looks up the receipt by the ID and returns a JSON object with the number of points awarded
 def points(id):
     return jsonify(getPointsFromID(session["sessionID"]))
 
