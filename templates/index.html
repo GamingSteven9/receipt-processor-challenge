@@ -8,21 +8,21 @@
 <body>
    <h1>Receipt Processor</h1>
 
-   <form action="{{ url_for('receipts') }}" method="post" enctype="multipart/form-data">  <!-- Form to generate id from receipt -->
-    {{ Receiptform.hidden_tag() }}
-    {{ Receiptform.jsonFile.label }} {{ Receiptform.jsonFile(accept=".json") }} <!-- Set the accepted file extension to ".json" when browsing the file -->
+   <form action="{{ url_for('receipts') }}" method="post" enctype="multipart/form-data">  <!-- Form to generate ID from receipt -->
+    {{ ReceiptForm.hidden_tag() }}
+    {{ ReceiptForm.jsonFile.label }} {{ ReceiptForm.jsonFile(accept=".json") }} <!-- Set the accepted file extension to ".json" when browsing the file -->
     <br>
-    {{ Receiptform.submit()}} <!--Submit button-->
+    {{ ReceiptForm.submitFile()}} 
     <br>
    </form>
 
    <br>
 
    <form action="{{ url_for('receipts') }}" method="post" enctype="multipart/form-data">  <!-- Form to get points from receipt -->
-    {{ idForm.hidden_tag() }}
-    {{ idForm.receiptID.label }} {{idForm.receiptID(style='width: 300px')}} <!-- Increase the width of the stringfield so the id is fully visible on the screen-->
+    {{ IDForm.hidden_tag() }}
+    {{ IDForm.receiptID.label }} {{IDForm.receiptID(style='width: 300px')}} <!-- Increase the width of the stringfield so the ID is fully visible on the screen-->
     <br>
-    {{ idForm.submitID()}} <!--Submit button-->
+    {{ IDForm.submitID()}}
     <br>
    </form>
 
