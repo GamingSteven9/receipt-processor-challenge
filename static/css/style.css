@@ -1,6 +1,14 @@
+body, html{
+    margin:0;
+    width:100%;
+    border-color: #736b5e;
+    color-scheme: dark !important;
+    background-color: #181a1b !important;
+}
+
 h1 {
-    border: 2px #eee solid;
-    color: brown;
+    border: 2px #696868 solid;
+    color: rgb(151, 92, 230);
     text-align: center;
     padding: 10px;
 }

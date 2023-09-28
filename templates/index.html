@@ -20,9 +20,9 @@
 
    <form action="{{ url_for('receipts') }}" method="post" enctype="multipart/form-data">  <!-- Form to get points from receipt -->
     {{ idForm.hidden_tag() }}
-    {{ idForm.receiptID.label }} {{idForm.receiptID(style='width: 250px')}} <!-- Increase the width of the stringfield so the id is fully visible on the screen-->
+    {{ idForm.receiptID.label }} {{idForm.receiptID(style='width: 300px')}} <!-- Increase the width of the stringfield so the id is fully visible on the screen-->
     <br>
-    {{ idForm.submitID()}}
+    {{ idForm.submitID()}} <!--Submit button-->
     <br>
    </form>
 
