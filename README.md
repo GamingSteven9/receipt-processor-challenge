@@ -39,9 +39,15 @@ Click the "Get Points" button to get the points
 # Credits
 
 https://github.com/fetch-rewards/receipt-processor-challenge
+
 https://docs.docker.com/language/python/
+
 https://flask.palletsprojects.com/en/2.3.x/
+
 https://docs.python.org/3/
+
 https://developer.mozilla.org/en-US/docs/Web/HTML
+
 https://developer.mozilla.org/en-US/docs/Web/CSS
+
 https://wtforms.readthedocs.io/en/3.0.x/
