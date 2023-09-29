@@ -141,7 +141,7 @@ def receipts():
             jsonContent = BytesIO(jsonData.read())
             jsonContent.seek(0)
             session["dictID"] = loads(jsonContent.read())
-            jsonContent.close() 
+            jsonContent.close()
             return redirect(url_for('process'), code=307) # Redirect to /receipts/process using code 307 to repeat the POST request from the 'submitFile' button
         case _:
             pass

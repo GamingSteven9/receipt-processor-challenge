@@ -28,9 +28,17 @@ Open http://localhost:8000/receipts in a browser
 
 # Test:
 
-Insert a JSON receipt
+![alt text](screenshots/InsertReceipt.PNG "Insert a JSON receipt into the file field")
 
-Click the "Generate ID" button to get the ID
+![alt text](screenshots/GenerateID.PNG "Click the "Generate ID" button to get the ID")
+
+![alt text](screenshots\IDOutput.PNG "Example output")
+
+![alt text](screenshots/InsertID.PNG "Input the ID into the text field")
+
+![alt text](screenshots/GetPoints.PNG "Click the "Get Points" button to get the points")
+
+![alt text](screenshots\PointsOutput.PNG "Example output")
 
 Input the ID into the text field
 
