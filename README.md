@@ -1,10 +1,24 @@
 # receipt-processor-challenge
 
-This is my submission of the receipt processor challenge for Fetch Reward's Backend Engineering Apprenticeship.
-This project was made using the Flask framework wih HTML and CSS for the frontend, and with Python for the backend, and is ran within a Docker container.
+# Table of contents
+1. [Introduction](#Introduction)
+2. [Prerequisite](#Prerequisite)
+3. [Install](#Install)
+4. [Run](#Run)
+5. [Test](#Test)
+5. [Credits](#Credits)
 
+# Introduction
+
+This is my submission of the receipt processor challenge for Fetch Reward's Backend Engineering Apprenticeship.
 This application takes in a JSON receipt and produces a JSON object with a randomly generated ID.
-You can than input the given ID to get a JSON object containing the number of points that the receipt was rewarded.
+You can then input the given ID to get a JSON object containing the number of points that the receipt was rewarded.
+
+This project was made using the Flask framework with HTML and CSS for the frontend, and with Python for the backend, and is ran within a Docker container.
+I used Python to build the backend since it is the language that I am most experienced with.
+
+One of the challenges that I faced during this project was working with the Flask framework since it has been a while since I had used it.
+One improvement that I could make for this project would be to have better error handling when the user enters a non '.json' file or when they enter an unknown ID.
 
 # Prerequisite
 
