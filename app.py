@@ -7,7 +7,6 @@ from process import determinePoints, createRandomID, addID
 from points import getPointsFromID
 from io import BytesIO
 from json import loads
-from secrets import token_hex
 from os import path
 
 app = Flask(__name__)
@@ -44,13 +43,14 @@ def receipts():
     receiptID = False
     ReceiptForm = receipt()
     IDForm = getID()
+
     match ReceiptForm.submitFile.data: # Operates on the data from the ReceiptForm
         case True:
             jsonData = ReceiptForm.jsonFile.data 
             ReceiptForm.validateFile(request.files['jsonFile'].filename) # Check if the given file is a JSON file
             jsonContent = BytesIO(jsonData.read())
             jsonContent.seek(0)
-            session["dictID"] = loads(jsonContent.read())
+            session["givenReceipt"] = loads(jsonContent.read())
             jsonContent.close()
             return redirect(url_for('process'), code=307) # Redirect to /receipts/process using code 307 to repeat the POST request from the 'submitFile' button
         case _:
@@ -67,9 +67,10 @@ def receipts():
 
 @app.route('/receipts/process', methods=['POST']) # A post endpoint that takes a JSON receipt and returns a JSON object with a randomly generated ID
 def process():
-    points = (determinePoints(session["dictID"])) # Stores the points from the given receipt
-    id = createRandomID(ids) # Stores the random id
+    points = (determinePoints(session["givenReceipt"])) # Stores the points from the given receipt for later use
+    id = createRandomID(ids) # Stores the random id in a variable for later use
     addID(ids, id, points) # Adds the given {"id", points} pair to ids
+    print(ids)
     return jsonify({"id": id})
 
 @app.route('/receipts/<id>/points', methods=['GET']) # A getter endpoint that looks up the receipt by the ID and returns a JSON object with the number of points awarded

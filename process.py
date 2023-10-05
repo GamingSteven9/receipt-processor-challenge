@@ -1,10 +1,7 @@
 from datetime import date, time
-from io import BytesIO
-from json import loads
 from re import sub
 from math import ceil
 from secrets import token_hex
-from os import path
 
 # Checks the retailer
 def checkRetailer(retailer):
@@ -94,7 +91,7 @@ def determinePoints(jDict):
                 points+=checkItemsDescription(jDict[i])
             case _:
                 pass
-    print(points)
+    #print(points)
     return points # Return the total amount of points
 
 # Creates a random ID that is not already in 'ids'
