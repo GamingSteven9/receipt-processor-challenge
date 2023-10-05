@@ -70,7 +70,7 @@ def process():
     points = (determinePoints(session["givenReceipt"])) # Stores the points from the given receipt for later use
     id = createRandomID(ids) # Stores the random id in a variable for later use
     addID(ids, id, points) # Adds the given {"id", points} pair to ids
-    print(ids)
+    #print(ids)
     return jsonify({"id": id})
 
 @app.route('/receipts/<id>/points', methods=['GET']) # A getter endpoint that looks up the receipt by the ID and returns a JSON object with the number of points awarded
